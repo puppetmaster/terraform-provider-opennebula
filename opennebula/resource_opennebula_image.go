@@ -286,6 +286,9 @@ func resourceOpennebulaImageCreate(d *schema.ResourceData, meta interface{}) err
 	log.Printf("DEBUG XML IMAGE UPDATE : %v", template)
 	// add template information into image
 	err = ic.Update(template, 1)
+	if err != nil {
+		return fmt.Errorf("Error adding template information into image (%s):  %s", d.Id(), err)
+	}
 
 	d.SetId(fmt.Sprintf("%v", imageID))
 
@@ -402,7 +405,7 @@ func waitForImageState(d *schema.ResourceData, meta interface{}, state string) (
 			if state == "READY" {
 				return image, "ready", nil
 			} else if state == "USED" {
-				return image, "used", nil
+				return image, "ready", nil
 			} else if state == "ERROR" {
 				return image, "error", fmt.Errorf("Image ID %v entered error state.", d.Id())
 			} else {
